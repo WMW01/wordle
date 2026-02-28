@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<head>
+    <title>Wordle</title>
+    <meta charset = "UTF-8">
+</head>
+<body>
+    <style>
+        .cell{padding: 3px; border: solid 1px; border-radius: 3px; width: 30px; height: 30px; display: inline-block}
+        .key{padding: 3px; border: solid 1px; width: 25px; height: 25px; display:inline-block; margin: 1px; vertical-align: middle}
+        .enter{width: 40px;}
+        .correct{background-color: green;}
+        .present{background-color: yellow;}
+        .absent{background-color: grey;}
+        .start_over{display: none}
+        .visible{display: block}
+        #word_board{text-align: center; padding: 10px}
+        #check{text-align: center; padding-bottom: 10px}
+        #outer_keyboard{text-align:center; padding: 20px}
+        #outer_start_over{display: flex; justify-content: center; width: 100%; padding-top: 15px}
+
+
+    </style>
+    <div id = word_board></div>
+    <div id = "check">
+    <form method = "get" action = "#">
+    <input type="text" id = "input_word" name = "input_word">
+    <button type="button" id = "check_my_guess">Check my Guess</button>
+    </form>
+    </div>
+    <div id ="outer_keyboard">
+    <div id = "keyboard"></div>
+    <div id = "outer_start_over"><button type="button" id = "start_over" class = "start_over">Start Over</button></div>
+    </div>
+    </body>
+    <script>
+        function create_one_word (row_index){
+            
+            let row = document.createElement('div');
+            row.className = `row${row_index}`; 
+            for (let i = 1; i <= 5; ++i){
+                let cell = document.createElement('div');
+                cell.className = `cell position${i}`;
+                row.appendChild(cell);
+            }
+
+            let word_board = document.getElementById('word_board');
+            word_board.appendChild(row)
+        }
+
+       
+        for (let i = 1; i <= 6; ++i){
+            create_one_word(i);
+        }
+
+        const keyboard_arr = [['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'], 
+                          ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+                          ['Enter', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '\u232b']]
+
+        function keyboard_line(line_index){
+            let line = document.createElement('div')
+            line.className = `line${line_index + 1}`
+            keyboard_arr[line_index].forEach((letter) => {
+                if (letter != "Enter"){
+                    let key = document.createElement('div');
+                    key.className = "key";
+                    key.id = letter
+                    key.innerHTML = letter;
+                    line.appendChild(key)
+                }else {
+                    let key_enter = document.createElement('div');
+                    key_enter.className = "key enter";
+                    key_enter.innerHTML = letter;
+                    line.appendChild(key_enter); 
+                }
+            })
+            const keyboard = document.getElementById('keyboard')
+            keyboard.appendChild(line)
+        }
+
+        for (let i = 0; i < 3; ++i){
+            keyboard_line(i); 
+        }
+
+        dictionary = ["abase", "abyss", "adorn", "baron", "basin", "bathe",
+                      "chore", "claim", "defer", "deity", "delay", "demur",
+                      "eagle", "eager", "ebony", "flame", "flick", "float",
+                      "flock", "grace", "grand", "guild", "harsh", "hatch",
+                      "heath", "hazel", "horse", "icily", "ideal", "imply",
+                      "inner", "input", "index", "maple", "manic", "match",
+                      "nadir", "naval", "ocean", "occur"]
+
+        class Wordle {
+            constructor () {
+                this.answer = dictionary [(Math.floor(Math.random() * 40))]; 
+                this.max_attempts = 6; 
+                this.current_word; 
+                this.num_attempts = 1; 
+                console.log(this.answer)
+            }
+
+            countAnswer () {
+                let AnswerLetterCount = {};
+                for (let letter of this.answer){
+                    AnswerLetterCount[letter] = (AnswerLetterCount[letter] || 0) + 1; 
+                }
+                return AnswerLetterCount
+            }
+
+
+            check_guess (){
+                let check_button = document.getElementById("check_my_guess");
+
+                check_button.addEventListener('click', () => {
+                    
+                    let letterCount = this.countAnswer();
+                    console.log(`the number of attempts so far : ${this.num_attempts}`);
+                    let guess = document.getElementById("input_word").value;
+                    this.current_word = guess; 
+                    if (guess.length != 5){
+                        alert("Please enter a five-letter word")
+                        return; 
+                    }
+                    for (let i = 0; i < 5; ++i){
+                        console.log(this.num_attempts);
+                        let current_letter = document.querySelector(`.row${this.num_attempts} .position${i + 1}`);
+                        current_letter.innerHTML = this.current_word[i];
+                        let key = document.getElementById(this.current_word[i].toUpperCase()); 
+                        if (this.current_word[i] == this.answer[i]){
+                           current_letter.classList.add('correct');
+                           letterCount[this.current_word[i]] -= 1; 
+                           key.classList.add('correct');
+                        }
+                    }
+
+
+                    for (let i = 0; i < 5; ++i){
+                        let current_letter = document.querySelector(`.row${this.num_attempts} .position${i + 1}`);
+                        let key = document.getElementById(this.current_word[i].toUpperCase()); 
+                        if (this.current_word[i] == this.answer[i]){
+                            continue; 
+                        }
+                        if (this.answer.includes(this.current_word[i])){
+                            if (letterCount[this.current_word[i]] > 0){
+                                current_letter.classList.add('present');
+                                letterCount[this.current_word[i]] -= 1;
+                                key.classList.add('present');
+                            }else if (letterCount[this.current_word[i]] <= 0){
+                                current_letter.classList.add('absent'); 
+                            }
+                        }else {
+                            current_letter.classList.add('absent');
+                            key.classList.add('absent'); 
+                        }
+                    }
+
+                    if (this.current_word == this.answer){
+                        setTimeout(()=> {
+                            alert('You Have Won!');
+                            document.getElementById('start_over').classList.add('visible');}, 150)
+                        return;
+                    }
+
+                    this.num_attempts++;
+                    
+                    if (this.num_attempts > 6){
+                        setTimeout(() => {
+                            alert("You have Lost");
+                            document.getElementById('start_over').classList.add('visible');}, 150)
+                        return;
+                    }
+
+                })
+
+            }
+
+            play(){
+                    document.getElementById('start_over').addEventListener('click', ()=> {
+                        location.reload();
+                    })
+                    this.check_guess();
+            }
+        }
+
+        let wordle = new Wordle ();
+        wordle.play(); 
+
+        
+
+
+        
+
+        
+
+    </script>
+</body>
+</html>
+
+
+<!-- if (guess == this.answer){
+    alert("You have won!")
+    document.getElementById('start_over').classList.add('visible'); 
+    return
+} -->
+<!-- 
+
+if (this.num_attempts == 6){
+    document.getElementById('start_over').classList.add('visible');
+    location.reload();
+} -->
