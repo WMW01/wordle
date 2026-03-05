@@ -207,7 +207,7 @@
                    this.num_attempts += 1;
                     
                     if (this.num_attempts > 6){
-                        updateStatw(num_attempts - 1, this.won)
+                        updateStats(num_attempts - 1, this.won)
                         setTimeout(() => {
                             alert("You have Lost");
                             document.getElementById('start_over').classList.add('visible');}, 150)
