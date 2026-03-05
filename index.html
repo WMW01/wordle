@@ -110,9 +110,9 @@
             let guesses_made = stats.totalGuesses; 
             let average;
             if (games_won = 0){
-                average = "NA"
+                average = None
             }else {
-                average = `${guesses_made / games_won}`;
+                average = guesses_made / games_won;
             }
             alert("Games won so far: " + games_won + "\n" + "Guesses made so far: " + guesses_made + "\n" + "Average guesses neede to win: " + average)   
             
