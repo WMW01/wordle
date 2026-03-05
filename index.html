@@ -18,6 +18,7 @@
         #check{text-align: center; padding-bottom: 10px}
         #outer_keyboard{text-align:center; padding: 20px}
         #outer_start_over{display: flex; justify-content: center; width: 100%; padding-top: 15px}
+        #outer_check_history{padding-top: 15px}
 
 
     </style>
@@ -30,6 +31,7 @@
     </div>
     <div id ="outer_keyboard">
     <div id = "keyboard"></div>
+    <div id = "outer_check_history"><button type="button" id ="check_history">Check History</button></div>
     <div id = "outer_start_over"><button type="button" id = "start_over" class = "start_over">Start Over</button></div>
     </div>
     </body>
@@ -99,6 +101,21 @@
             }
             document.cookie = `wordleStats=${JSON.stringify(stats)}`;
 
+        }
+
+        function reportStats(){
+            let cookieValue = document.cookie.split("=")[1];
+            let stats = JSON.parse(cookieValue || '{"gamesWon": 0, "totalGuesses": 0}');
+            let games_won = stats.gamesWon;
+            let guesses_made = stats.totalGuesses; 
+            let average;
+            if (games_won = 0){
+                average = "NA"
+            }else {
+                average = `${guesses_made / games_won}`;
+            }
+            alert("Games won so far: " + games_won + "\n" + "Guesses made so far: " + guesses_made + "\n" + "Average guesses neede to win: " + average)   
+            
         }
 
         class Wordle {
@@ -201,6 +218,7 @@
             }
 
             async play(){
+                    document.getElementById('check_history').addEventListener('click', reportStats);
                     document.getElementById('start_over').addEventListener('click', ()=> {
                         location.reload();
                     })
