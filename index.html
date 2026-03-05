@@ -98,7 +98,7 @@
             if (won) {
                 stats.gamesWon += 1;
             }
-            stats.totalGuesses += num_guesses
+            stats.totalGuesses += num_guesses;
             document.cookie = `wordleStats=${JSON.stringify(stats)}`;
             console.log(document.cookie)
 
