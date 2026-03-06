@@ -209,7 +209,7 @@
                     if (this.num_attempts > 6){
                         updateStats(this.num_attempts - 1, this.won)
                         setTimeout(() => {
-                            alert("You have Lost");
+                            alert("You have Lost. The correct answer is: " + self.answer);
                             document.getElementById('start_over').classList.add('visible');}, 150)
                         return;
                     }
